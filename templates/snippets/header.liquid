@@ -1,0 +1,70 @@
+{%- cache "header", items: [current_store, current_customer, current_cart]  -%}
+  {%- if current_store.header != blank %}
+    {{ current_store.header.render }}
+  {%- else %}
+    {%- capture store_logo %}
+    <a href="{{ current_store.home_path }}" class="SC-Logo">
+      {%- if current_store.logo != blank %}
+        <img src="{{ current_store.logo.url }}" class="SC-Logo_image">
+      {%- else %}
+        <svg class="SC-Placeholder" width="180px" viewBox="0 0 180 40">
+          <rect width="100%" height="100%" rx="20"></rect>
+        </svg>
+      {%- endif %}
+    </a>
+    {%- endcapture %}
+    
+    {%- assign menu_identifier = current_store.header_menu | try: "identifier" | default: "header" %}
+
+    <header class="SC-Header" id="SC-Header">
+      {%- render "header/geolocation" %}
+      <div class="SC-Header_inner">
+
+        <div class="SC-Header_inner_left">
+          <button 
+            data-menu-init="{{ menu_identifier }}" 
+            class="SC-Icon SC-Icon-button SC-Icon-large sc-hide-large-and-up" 
+            type="button">
+            {%- render "shared/icons/hamburger" %}
+          </button>
+          <div class="sc-hide-up-to-medium">
+            {{ store_logo }}
+          </div>
+        </div>
+
+        <div class="SC-Header_inner_center">
+          <div class="sc-hide-medium-and-up">
+            {{ store_logo }}
+          </div>
+          <div class="sc-grow">
+            {%- if current_store.header_menu != blank %}
+              {{ current_store.header_menu.render }}
+            {%- else %}
+              <ul class="SC-Menu dropdown tier1 center" id="SC-HeaderMenuPrimary" data-menu="header">
+                {%- render "header/menu" %}
+              </ul>
+            {%- endif %}
+          </div>
+        </div>
+
+        <div class="SC-Header_inner_right">
+          <ul class="SC-Menu tier1 end sc-justify-end" id="SC-HeaderMenuSecondary">
+            {%- render "header/dropdown/search" %}
+            {%- render "header/dropdown/account" %}
+            {%- render "header/dropdown/register" %}
+            {%- render "header/dropdown/cart" %}
+          </ul>
+        </div>
+      </div>
+      <div class="SC-Header_search sc-flex sc-justify-center" data-js-toggle-active-target="SC-Header_search">
+        <div class="sc-expand-up-to-large sc-one-half sc-ms-auto sc-ps-large sc-pt-medium">
+          {%- render "header/search" %}
+          <span class="SC-Icon-close sc-pos-absolute sc-right-0 sc-top-0 sc-color-secondary sc-cursor-pointer" data-js-toggle-active-trigger="SC-Header_search">
+            {%- render 'shared/icons/close' %}
+          </span>
+      </div>
+      </div>
+    </header>
+    {%- render "header/dropdown/cart_sidebar" %}
+  {%- endif %}
+{%- endcache %}

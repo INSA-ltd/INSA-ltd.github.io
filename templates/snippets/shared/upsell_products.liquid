@@ -1,0 +1,26 @@
+{% default upsell_products: blank %}
+
+<section class="sc-pe-base sc-mt-xlarge sc-border-top">
+  <h3 class="sc-font-xlarge">{{ "sc.upsell.products.title" | t }}</h3>
+  {%- if upsell_products.size > 0 %}
+    <div class="sc-two-to-four-column">
+      {%- paginate upsell_products by 4 %}
+        {%- for product in upsell_products %}
+          <div class="sc-card" id="{{ product.id }}">
+            <a href={{ product.path }}>
+              {%- if product.image != blank %}
+                <img src="{{ product.image.medium_url }}" alt="{{ product.image.alt_text }}">
+              {%- else %}
+                {%- render 'shared/placeholder_image' %}
+              {%- endif %}
+              <div class="sc-text-center sc-mt-small">
+                <h4 class="sc-font-light sc-font-base sc-mb-tiny">{{ product.name }}</h4>
+                <p class="sc-font-light sc-font-base">{{ product.pricing.price | money, compact: true }}</p>
+              </div>
+            </a>
+          </div>
+        {%- endfor %}
+      {%- endpaginate %}
+    </div>
+  {%- endif %}
+</section>

@@ -1,0 +1,33 @@
+{% if current_product_category.ancestors.size > 0 %}
+<script type="text/javascript">
+  const breadcrumbs = () => {
+    let el = document.querySelector('ul.SC-Breadcrumb');
+    let lastItem = el.lastElementChild;
+    
+    const parentSize = {{ current_product_category.ancestors.size }};
+    let ancestorName, ancestorPath;
+
+    {%-if current_product_category.ancestors.first %}
+      ancestorName = "{{ current_product_category.ancestors.first.name }}";
+      ancestorPath = "{{ current_product_category.ancestors.first.path }}";
+    {%- endif %}
+
+    if (parentSize > 0 || parentSize != undefined) {
+      const parentCat = () => {
+        let item = document.createElement('li');
+        item.classList.add('SC-Breadcrumb_item');
+        let anchor = document.createElement('a');
+        anchor.setAttribute('href', ancestorPath);
+        anchor.textContent = ancestorName;
+
+        item.appendChild(anchor);
+        return item;
+      }
+      
+      let parentCatItem = parentCat();
+      el.insertBefore(parentCat(), lastItem);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', breadcrumbs);
+</script>
+{% endif %}

@@ -1,0 +1,5 @@
+{% if current_customer == blank %}
+  <li class="SC-Menu_item sc-hide-up-to-medium">
+    <a class="SC-Menu_link" href="{{ current_store.url }}/accounts/register">{{ "Register" }}</a>
+  </li>
+{% endif %}

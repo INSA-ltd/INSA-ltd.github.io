@@ -1,0 +1,171 @@
+{%- if current_product %}
+{% comment %}It displays a modal on product pages {% endcomment %}
+{% assign product_name = current_product.name %}
+  <div class="SC-Modal SC-Modal-skinny sc-cart_modal sc-ms-auto" data-modal="cart" data-nav="cart" data-sc-cart>
+    <div class="SC-Modal_inner sc-ps sc-pe-base">
+      <div class="SC-Modal_body sc-one-to-two-column">
+        <div class="sc-border-right sc-pe sc-flex-col sc-gap sc-text-center">
+          {%- if current_cart.items.size > 0 %}
+            {%- for item in current_cart.items %}
+              {%- if item.name == product_name %}
+                <h3 class="sc-font-light sc-font-medium sc-color-sale">
+                  <span>{% render 'shared/icons/check', height: "1em", style_class: "sc-mr-tiny" %}</span>
+                  <span>{{ "Added to cart successfully!" }}</span>
+                </h3>
+                <img 
+                  src="{{ current_product.image.medium_url }}" 
+                  alt="{{ current_product.image.alt_text }}" 
+                  style="width: 120px;"
+                  class="sc-ms-auto"
+                  >
+                <div class="sc-flex-col sc-gap-tiny">
+                      <span>{{ item.name }}</span>
+                      <span class="sc-mb-small">{{ current_product.pricing.price | money, compact: false }}</span>
+                      <span class="sc-display-inline-block sc-font-light sc-font-small">{{ "Qty:"}} {{ item.quantity }}</span>
+                      <span class="sc-display-inline-block sc-font-light sc-font-small">{{ "Total:" }} {{ item.pricing.checkout_price | money, compact: false }}</span>
+                </div>
+              {% break %}
+              {% elsif forloop.last %}
+                <h3 class="sc-font-light sc-font-medium sc-color-sale">
+                  <span>{% render 'shared/icons/check', height: "1em", style_class: "sc-mr-tiny" %}</span>
+                  <span>{{ "Recently added:" }}</span>
+                </h3>
+                <img 
+                  src="{{ item.product.image.medium_url }}" 
+                  alt="{{ item.product.image.alt_text }}" 
+                  style="width: 120px;"
+                  class="sc-ms-auto"
+                  >
+                <div class="sc-flex-col sc-gap-tiny">
+                      <span>{{ item.name }}</span>
+                      <span class="sc-mb-small">{{ item.pricing.price | money, compact: false }}</span>
+                      <span class="sc-display-inline-block sc-font-light sc-font-small">{{ "Qty:"}} {{ item.quantity }}</span>
+                      <span class="sc-display-inline-block sc-font-light sc-font-small">{{ "Total:" }} {{ item.pricing.checkout_price | money, compact: false }}</span>
+                </div>
+              {%- endif %}
+            {%- endfor %}
+          {% else %}
+            <h3 class="sc-font-light sc-font-medium sc-color-sale">
+              <span>{{ "Nothing recently added" }}</span>
+            </h3>
+          {%- endif %}
+        </div>
+        <div class="sc-flex-col sc-gap sc-pb sc-text-center sc-pe">
+          {%- if current_cart.item_count == 1 %}
+            <p style="line-height: 20px;"> There is {{ current_cart.item_count }} item <br> in your cart</p>
+          {% else %}
+            <p style="line-height: 20px;"> There are {{ current_cart.item_count }} items <br> in your cart</p>
+          {%- endif %}
+            <p class="sc-font-light">{{ "Cart total:" }} <span data-currency class="sc-font-medium">{{ current_cart.total | money, compact: false }}</span></p>
+          {%- render 'shared/cart/continue_shopping_button', class: "sc-cart_button sc-button-outline sc-ms-auto sc-three-quarters" %}
+          {%- render "shared/cart/view_cart_button", class: "sc-cart_button sc-bg-darkest sc-ms-auto sc-three-quarters sc-color-white" %}
+        </div>
+      </div>
+
+      {%# upsell products %}
+      {%- if current_product.variant? %}
+        {% assign count = current_product.master.related_products.size | default: 0 %}
+      {%- else %}
+        {% assign count = current_product.related_products.size | default: 0 %}
+      {%- endif %}
+      {% if count > 0 %}
+
+      <div class="SC-Modal_footer sc-border-top sc-pt-base">
+        <h3 class="sc-mb sc-color-black">{{ "sc.upsell.products.modal.title" | t }}</h3>
+
+        {%# slider %}
+        <div id="modal-slider" data-upsell-products-slider>
+        {%- if current_product.variant? %}
+          {%- for related in current_product.master.related_products %}
+            <div>
+              <div class="sc-card sc-pb-medium">
+                <a href={{ related.path }}>
+                  {%- if related.image != blank %}
+                    <img src="{{ related.image.medium_url }}" alt="{{ related.image.alt_text }}">
+                  {%- else %}
+                    {%- render 'shared/placeholder_image' %}
+                  {%- endif %}
+                  <div class="sc-text-center sc-mt-small">
+                    <h4 class="sc-font-light sc-font-base sc-color-black sc-mb-tiny">{{ related.name }}</h4>
+                    {%- if related.variants.size > 0 %}
+                      <a class="SC-Link sc-font-light sc-font-base sc-mt-micro" href="{{ related.path }}">{{ "Select option" }}</a>
+                    {%- else %}
+                      <p class="sc-font-light sc-font-base sc-mt-micro" data="{{ related.variants.size }}">{{ related.pricing.price | money, compact: true }}</p>
+                    {%- endif %}
+                  </div>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {%- else %}
+          {%- for related in current_product.related_products %}
+            <div>
+              <div class="sc-card sc-pb-medium">
+                <a href="{{ related.path }}">
+                  {%- if related.image != blank %}
+                    <img src="{{ related.image.medium_url }}" alt="{{ related.image.alt_text }}">
+                  {%- else %}
+                    {%- render 'shared/placeholder_image' %}
+                  {%- endif %}
+                  <div class="sc-text-center sc-mt-small">
+                    <h4 class="sc-font-light sc-font-base sc-color-black sc-mb-tiny">{{ related.name }}</h4>
+                    {%- if related.variants.size > 0 %}
+                      <a class="sc-font-light sc-font-base" href="{{ related.path }}">{{ "Select option" }}</a>
+                    {%- else %}
+                      <p class="sc-font-light sc-font-base sc-mt-micro" data="{{ related.variant? }}">{{ related.pricing.price | money, compact: true }}</p>
+                    {%- endif %}
+                  </div>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {%- endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      {%# floating close button %}
+      <div class="sc-cart_close sc-cursor-pointer sc-bg-lightest sc-shadow" data-modal-trigger="cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1.3rem" viewBox="0 0 384 512">
+          <path d="M324.5 411.1c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6L214.6 256 347.1 123.5c6.2-6.2 6.2-16.4 0-22.6s-16.4-6.2-22.6 0L192 233.4 59.5 100.9c-6.2-6.2-16.4-6.2-22.6 0s-6.2 16.4 0 22.6L169.4 256 36.9 388.5c-6.2 6.2-6.2 16.4 0 22.6s16.4 6.2 22.6 0L192 278.6 324.5 411.1z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="SC-Modal_overlay"></div>
+  </div>
+{%- else %}
+  {%- comment %} Sidebar {% endcomment %}
+    <div class="sc-cart_dropdown" data-modal="cart" data-sc-cart>
+      <div class="sc-cart_header sc-border-bottom-lightest">
+        <div class="sc-cart_header_section sc-p-small sc-border-right-lightest">
+          <button data-modal-trigger="cart" type="button" class="sc-flex">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.3rem" viewBox="0 0 384 512">
+              <path d="M324.5 411.1c6.2 6.2 16.4 6.2 22.6 0s6.2-16.4 0-22.6L214.6 256 347.1 123.5c6.2-6.2 6.2-16.4 0-22.6s-16.4-6.2-22.6 0L192 233.4 59.5 100.9c-6.2-6.2-16.4-6.2-22.6 0s-6.2 16.4 0 22.6L169.4 256 36.9 388.5c-6.2 6.2-6.2 16.4 0 22.6s16.4 6.2 22.6 0L192 278.6 324.5 411.1z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sc-p-small">
+          <h3 class="sc-m-none">{{ "Shopping Cart" }}</h3>
+        </div>
+        <div class="sc-cart_header_section sc-p-small sc-border-left-lightest">
+        {{ current_cart.item_count }}
+        </div>
+      </div>
+      
+      {%- comment %} Line items {% endcomment %}
+
+      <div class="SC-CartProducts sc-grow sc-overflow-y-auto sc-ps-medium">
+        {%- render "shared/cart/items", source: current_cart, compact: true, width: "70px" %}
+      </div>
+      {%- comment %} Cart total {% endcomment %}
+      <div class="sc-cart_total sc-p-medium" data-cart-nav-summary>
+        {%- render "shared/order_total", source: current_cart, compact: true %}
+      </div>
+      {%- comment %} Checkout button {% endcomment %}
+      <div class="sc-cart_actions sc-color-white">
+        {%- render "shared/cart/view_cart_button", class: "sc-cart_button sc-bg-dark sc-one-half" %}
+        {%- render "shared/cart/checkout_button", class: "sc-cart_button sc-bg-darkest sc-one-half" %}
+      </div>
+    </div>
+  <div class="sc-cart_overlay"></div>
+{%- endif %}
